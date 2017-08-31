@@ -1,0 +1,41 @@
+version: '3.3'
+
+
+services:
+    web:
+        image: minimum/markdown-web
+        volumes:
+          - type: volume
+            source: markdown
+            target: /home/python/markdown
+            read_only: true
+        logging:
+            driver: json-file
+            options:
+                max-size: 10m
+                max-file: '3'
+        ports:
+          - '80:80'
+        environment:
+            FLASK_DEBUG: 0
+    aws:
+        image: minimum/cron:py3
+        volumes:
+          - type: volume
+            source: markdown
+            target: /data
+          - type: bind
+            source: ./src
+            target: /usr/local/cron
+        logging:
+            driver: json-file
+            options:
+                max-size: 10m
+                max-file: '3'
+        env_file: .env
+        command: -f
+
+
+volumes:
+    markdown:
+        driver: local
